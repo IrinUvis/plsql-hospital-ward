@@ -92,3 +92,10 @@ WHERE d.hire_date > (SELECT d.hire_date
                     FROM doctors d
                     WHERE d.first_name = 'Regan' AND d.last_name = 'Hall')
 ORDER BY d.last_name, d.first_name, d.hire_date;
+
+-- 11. Show total numbers of doctors who were hired in specific year. 
+
+SELECT EXTRACT(YEAR FROM d.hire_date) year, COUNT(*) no_of_employees
+FROM doctors d
+GROUP BY EXTRACT(YEAR FROM d.hire_date)
+ORDER BY EXTRACT(YEAR FROM d.hire_date) ASC;
