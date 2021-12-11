@@ -12,7 +12,7 @@ CREATE TABLE specializations (
 
 -- pacjent
 CREATE TABLE patients (
-    patient_id NUMBER(11) NOT NULL CHECK (patient_id BETWEEN 00000000000 AND 99999999999), -- PESEL trigger czy inna funkcja upewniająca się, że format jest git lub
+    patient_id VARCHAR2(11) NOT NULL, -- PESEL trigger czy inna funkcja upewniająca się, że format jest git lub
     first_name VARCHAR2(20) NOT NULL,  -- wstawiająca datę urodzenia zależnie od peselu czy coś?
     last_name VARCHAR2(20) NOT NULL,
     gender CHAR(1) NOT NULL, -- tutaj mozna dac trigger do tworzenia i edycji upewniajacy sie ze ta wartosc to M dla faceta, F dla kobiety
@@ -44,7 +44,7 @@ CREATE TABLE doctors (
 CREATE TABLE visits (
     visit_id NUMBER(6) NOT NULL,
     doctor_id NUMBER(6) NOT NULL,
-    patient_id NUMBER(11) NOT NULL,
+    patient_id VARCHAR2(11) NOT NULL,
     registration_date DATE, -- trigger upewniajacy sie ze discharge_date jest tego samego dnia lub pozniej niz registration_date
     discharge_date DATE,
     CONSTRAINT pk_visits
