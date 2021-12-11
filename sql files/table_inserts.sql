@@ -104,7 +104,7 @@ INSERT INTO patients (
 INSERT INTO doctors (
     doctor_id, specialization_id, first_name, last_name, gender, date_of_birth, phone_number, hire_date, salary)
     VALUES (
-    100, 'NRLG', 'Mariam', 'Navaro', 'F', '15-FEB-197', 123654789, '12-MAY-2017', 12000);
+    100, 'NRLG', 'Mariam', 'Navaro', 'F', '15-FEB-1975', 123654789, '12-MAY-2017', 12000);
 
 INSERT INTO doctors (
     doctor_id, specialization_id, first_name, last_name, gender, date_of_birth, phone_number, hire_date, salary)
@@ -273,3 +273,8 @@ INSERT INTO prescriptions (
     prescription_id, drug_id, visit_id, start_date, end_date, daily_amount)
     VALUES (
     105, 107, 108, '08-FEB-2021', '22-FEB-2021', 3);
+
+INSERT INTO prescriptions (
+    prescription_id, drug_id, visit_id, start_date, end_date, daily_amount)
+    VALUES (
+    106, 101, 102, '05-JAN-2021', '12-JAN-2021', 2);
