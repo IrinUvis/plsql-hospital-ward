@@ -93,9 +93,19 @@ WHERE d.hire_date > (SELECT d.hire_date
                     WHERE d.first_name = 'Regan' AND d.last_name = 'Hall')
 ORDER BY d.last_name, d.first_name, d.hire_date;
 
--- 11. Show total numbers of doctors who were hired in specific year. 
+-- 11. Show total numbers of patients who were registered in specific year. 
 
-SELECT EXTRACT(YEAR FROM d.hire_date) year, COUNT(*) no_of_employees
-FROM doctors d
-GROUP BY EXTRACT(YEAR FROM d.hire_date)
-ORDER BY EXTRACT(YEAR FROM d.hire_date) ASC;
+SELECT EXTRACT(YEAR FROM v.registration_date) year, COUNT(*) no_of_patients
+FROM visits v
+GROUP BY EXTRACT(YEAR FROM v.registration_date)
+ORDER BY EXTRACT(YEAR FROM v.registration_date) ASC;
+
+-- 12. Show average length of a hospital stay for patients grouped by the specialization name. 
+
+SELECT s.specialization_name, specialization_average_stay_f(s.specialization_name) average_stay
+FROM specializations s;
+
+-- 13. Show average dose of all drugs per day prescribed for all patients
+
+SELECT d.drug_name, avg_drug_dose_for_given_age_group_f(d.drug_name, 0, 150) average_dose
+FROM drugs d;
