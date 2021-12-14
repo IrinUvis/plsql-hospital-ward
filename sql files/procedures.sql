@@ -1,21 +1,5 @@
-select * from doctors;
-select * from drugs;
-select * from patients;
-select * from prescriptions;
-select * from specializations;
-select * from visits;
-drop table doctors;
-drop table drugs;
-drop table patients;
-drop table prescriptions;
-drop table specializations;
-drop table  visits;
+
 set serveroutput on;
-
-
-
-select * from visits a inner join patients b on a.patient_id=b.patient_id inner join prescriptions c on a.visit_id=c.visit_id inner join drugs d on c.drug_id=d.drug_id;
-
 
 
 
@@ -33,7 +17,6 @@ prescr_max_id prescriptions.prescription_id%type;
 is_found_rec boolean := false;
 
 cursor c is select * from visits a inner join patients b on a.patient_id=b.patient_id inner join prescriptions c on a.visit_id=c.visit_id inner join drugs d on c.drug_id=d.drug_id where (c.end_date is null or c.end_date< sysdate) and d.drug_name=drg_n and c.daily_amount!=daily_am;
-
 
 drug_record drugs%rowtype;
 
@@ -68,15 +51,15 @@ if not is_found_rec then
 select * into drug_record from drugs where drug_name=drg_n;
 insert into prescriptions(prescription_id , drug_id, visit_id, start_date, end_date, daily_amount) values(prescr_max_id +1, drug_record.drug_id, vis_id, sysdate, enddat, daily_am);
 dbms_output.put_line('Successfully done');
+
 end if;
 
 exception
 when no_data then
 dbms_output.put_line('Incorect input data.');
 
-
-
 end;
+
 
 
 
@@ -86,7 +69,7 @@ end;
 --show patient's history
 create or replace procedure show_patients_history(pat_id in patients.patient_id%type)
 is
-cursor history is select * from patients a inner join visits b on a.patient_id = b.patient_id inner join doctors c on c.doctor_id=b.doctor_id inner join specializations d on c.specialization_id=d.specialization_id inner join prescriptions e on e.visit_id=b.visit_id inner join drugs f on e.drug_id=f.drug_id where a.patient_id=pat_id;
+cursor history is select * from patients a inner join visits b on a.patient_id = b.patient_id inner join doctors c on c.doctor_id=b.doctor_id inner join specializations d on  c.specialization_id=d.specialization_id inner join prescriptions e on e.visit_id=b.visit_id inner join drugs f on e.drug_id=f.drug_id where a.patient_id=pat_id;
 is_found_rec boolean := false;
 pat patients%rowtype;
 
@@ -118,7 +101,13 @@ FOR rec IN history
   LOOP  
 
     is_found_rec := true;
-    dbms_output.put_line('Tutaj string z info o histori');
+    if rec.discharge_date is null then
+    dbms_output.put_line('Patient has a visit from ' || rec.Registration_date || ' - until now and has been served by '|| rec.specialization_name ||'. During visit patient was prescribed for '|| rec.drug_name || ' with dosage '|| rec.daily_amount || ' for time between ' || rec.start_date || ' - ' || rec.end_date );
+
+    else
+    dbms_output.put_line('Patient had a visit between ' || rec.Registration_date || ' - ' || rec.discharge_date ||' and has been served by '|| rec.specialization_name || '. During visit patient was prescribed for '|| rec.drug_name ||  ' with dosage '|| rec.daily_amount || ' for time between ' || rec.start_date || ' - ' || rec.end_date );
+
+    end if;
     
          
 
@@ -139,12 +128,13 @@ dbms_output.put_line('Patient has no history');
 
 end;
 
-exec show_patients_history('00000000000');
-
-exec show_patients_history('06311195765');
 
 
-select * from patients a inner join visits b on a.patient_id = b.patient_id inner join doctors c on c.doctor_id=b.doctor_id inner join specializations d on c.specialization_id=d.specialization_id inner join prescriptions e on e.visit_id=b.visit_id inner join drugs f on e.drug_id=f.drug_id;
+
+
+
+
+
 
 
 
