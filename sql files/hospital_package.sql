@@ -166,24 +166,28 @@ CREATE OR REPLACE PACKAGE BODY hospital_package IS
 --3.
     procedure show_patients_history(pat_id in patients.patient_id%type)
     is
-        cursor history is select * from patients a inner join visits b on a.patient_id = b.patient_id 
-        inner join doctors c on c.doctor_id=b.doctor_id 
-        inner join specializations d on c.specialization_id=d.specialization_id 
-        inner join prescriptions e on e.visit_id=b.visit_id 
-        inner join drugs f on e.drug_id=f.drug_id where a.patient_id=pat_id;
-        
-        is_found_rec boolean := false;
-        pat patients%rowtype;
+        cursor history is 
+            select * from patients a 
+            inner join visits b on a.patient_id = b.patient_id 
+            inner join doctors c on c.doctor_id=b.doctor_id 
+            inner join specializations d on  c.specialization_id=d.specialization_id 
+            inner join prescriptions e on e.visit_id=b.visit_id 
+            inner join drugs f on e.drug_id=f.drug_id 
+            where a.patient_id=pat_id;
+            
+            is_found_rec boolean := false;
+            pat patients%rowtype;
 
-        e exception;
-        no_rec exception;
-        pragma exception_init(e,100);
+            e exception;
+            no_rec exception;
+            pragma exception_init(e,100);
 
     begin
         --check if record pesel is valid
         select * into pat from patients where patient_id=pat_id;
+        
         if pat.patient_id is null then
-            raise e;
+            raise e; 
         else
             dbms_output.put_line('Patient: ' || pat.first_name || ' ' || pat.last_name);
             dbms_output.put_line('Date_of_birth: ' || pat.date_of_birth);
@@ -192,22 +196,27 @@ CREATE OR REPLACE PACKAGE BODY hospital_package IS
             else
                 dbms_output.put_line('Gender: Male');
             end if;
-            dbms_output.put_line('Phone number: ' || pat.phone_number);
+                dbms_output.put_line('Phone number: ' || pat.phone_number);
         end if;
 
         FOR rec IN history
         LOOP  
             is_found_rec := true;
-            dbms_output.put_line('Tutaj string z info o historii');
+            if rec.discharge_date is null then
+                dbms_output.put_line('Patient has a visit from ' || rec.Registration_date || ' - until now and has been served by '|| rec.specialization_name ||'. During visit patient was prescribed for '|| rec.drug_name || ' with dosage '|| rec.daily_amount || ' for time between ' || rec.start_date || ' - ' || rec.end_date );
+            else
+                dbms_output.put_line('Patient had a visit between ' || rec.Registration_date || ' - ' || rec.discharge_date ||' and has been served by '|| rec.specialization_name || '. During visit patient was prescribed for '|| rec.drug_name ||  ' with dosage '|| rec.daily_amount || ' for time between ' || rec.start_date || ' - ' || rec.end_date );
+            end if; 
         END LOOP; 
 
-        if not is_found_rec then 
+         if not is_found_rec then 
             raise no_rec;
-        end if;
+         end if;
+
     exception
         when e then
             dbms_output.put_line('failed');
-    
+        
         when no_rec then
             dbms_output.put_line('Patient has no history');
     end;
