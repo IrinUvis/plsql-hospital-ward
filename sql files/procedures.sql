@@ -57,7 +57,7 @@ loop
     is_found_rec := true;
     dbms_output.put_line('Patient is currently taking this drug in daily amount of '|| rec.daily_amount);
     update prescriptions set end_date=sysdate where prescription_id=rec.prescription_id;
-    insert into prescriptions(prescription_id , drug_id, visit_id, start_date, end_date, daily_amount) values(prescr_max_id +1, rec.drug_id, vis_id, sysdate, enddat, daily_am);
+    insert into prescriptions(prescription_id , drug_id, visit_id, start_date, end_date, daily_amount) values(prescr_max_id +1, drg.drug_id, vis_id, sysdate, enddat, daily_am);
     dbms_output.put_line('Successfuly done');
 end loop;
 
@@ -118,7 +118,7 @@ FOR rec IN history
   LOOP  
 
     is_found_rec := true;
-    dbms_output.put_line('Tutaj string z info o historii');
+    dbms_output.put_line('Tutaj string z info o histori');
     
          
 
