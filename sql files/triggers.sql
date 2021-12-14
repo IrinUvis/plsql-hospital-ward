@@ -18,7 +18,7 @@ END;
     --the 'F' should be changed to 'M'
     insert into Patients patients (
     patient_id, first_name, last_name, gender, date_of_birth, phone_number)
-    VALUES (12301378910, 'y', 'z', 'F', '07-JUL-1990', 123456789);
+    VALUES ('12301378910', 'y', 'z', 'F', '07-JUL-1990', 123456789);
 
 select * from patients;
 rollback;
@@ -74,7 +74,7 @@ select * from specializations where specialization_id = 'NRLG';
 INSERT INTO doctors (
     doctor_id, specialization_id, first_name, last_name, gender, date_of_birth, phone_number, hire_date, salary)
     VALUES (
-    10001, 'NRLG', 'Mariam', 'Navaro', 'F', '15-FEB-197', 123654789, '12-MAY-2017', 6000);
+    10001, 'NRLG', 'Mariam', 'Navaro', 'F', '15-FEB-1975', 123654789, '12-MAY-2017', 6000);
 select * from doctors where doctor_id = 10001;
 rollback;
 
@@ -83,7 +83,7 @@ select * from specializations where specialization_id = 'NRLG';
 INSERT INTO doctors (
     doctor_id, specialization_id, first_name, last_name, gender, date_of_birth, phone_number, hire_date, salary)
     VALUES (
-    10001, 'NRLG', 'Mariam', 'Navaro', 'F', '15-FEB-197', 123654789, '12-MAY-2017', 40000);
+    10001, 'NRLG', 'Mariam', 'Navaro', 'F', '15-FEB-1975', 123654789, '12-MAY-2017', 40000);
 select * from doctors where doctor_id = 10001;
 rollback;
 
@@ -108,6 +108,6 @@ END;
 --try to insert person who was (will be?) born in 2083 and is a male 
  insert into Patients patients (
     patient_id, first_name, last_name, gender, date_of_birth, phone_number)
-    VALUES (83223178910, 'x', 'y', 'F', '07-JUL-1990', 123456789);
+    VALUES ('83223178910', 'x', 'y', 'F', '07-JUL-1990', 123456789);
 select * from Patients where first_name = 'x';
 rollback;
