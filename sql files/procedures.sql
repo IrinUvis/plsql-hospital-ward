@@ -22,20 +22,13 @@ select * from visits a inner join patients b on a.patient_id=b.patient_id inner 
 create or replace procedure visit_outcome(doc_id in doctors.doctor_id%type, vis_id in visits.visit_id%type, pt_id in patients.patient_id%type, drg_n in drugs.drug_name%type, enddat in prescriptions.end_date%type, daily_am in prescriptions.daily_amount%type)
 is
 doc doctors.doctor_id%type;
-no_doc exception;
-pragma exception_init(no_doc,100);
-
-
+no_data exception;
+pragma exception_init(no_data,100);
 drg drugs%rowtype;
-no_drg exception;
-pragma exception_init(no_drg,100);
-
 vis visits%rowtype;
-no_vis exception;
-pragma exception_init(no_vis,100);
 pat_id patients.patient_id%type;
 
-
+prescr_max_id prescriptions.prescription_id%type;
 
 is_found_rec boolean := false;
 
@@ -45,31 +38,26 @@ cursor c is select * from visits a inner join patients b on a.patient_id=b.patie
 drug_record drugs%rowtype;
 
 begin
---check if doc_id is valid
+
+
 select doctor_id into doc from doctors where doctor_id=doc_id;
-if doc is null then
-raise no_doc;
-end if;
-
---check if drug name is valid
 select * into drg from drugs where drug_name=drg_n;
-if drg.drug_id is null then
-raise no_drg;
-end if;
-
---check if visit id is valid
 select * into vis from visits where visit_id=vis_id;
-if vis.visit_id is null then
-raise no_vis;
+if vis.visit_id is null or drg.drug_id is null or doc is null then
+raise no_data;
 end if;
 
+
+
+--get max_id of prescription
+select max(prescription_id) into prescr_max_id from prescriptions;
 --check if patient has this drug prescribed and end_date is null or before today. If yes then ends and gives new one.
 for rec in c 
 loop
     is_found_rec := true;
     dbms_output.put_line('Patient is currently taking this drug in daily amount of '|| rec.daily_amount);
     update prescriptions set end_date=sysdate where prescription_id=rec.prescription_id;
-    insert into prescriptions values(rec.prescription_id, rec.drug_id, rec.visit_id, sysdate, enddat, daily_am);
+    insert into prescriptions(prescription_id , drug_id, visit_id, start_date, end_date, daily_amount) values(prescr_max_id +1, rec.drug_id, vis_id, sysdate, enddat, daily_am);
     dbms_output.put_line('Successfuly done');
 end loop;
 
@@ -78,19 +66,15 @@ end loop;
 if not is_found_rec then
 
 select * into drug_record from drugs where drug_name=drg_n;
-insert into prescriptions values(rec.prescription_id, drug_record.drug_name, vis_id, sysdate, enddat, daily_am);
+insert into prescriptions(prescription_id , drug_id, visit_id, start_date, end_date, daily_amount) values(prescr_max_id +1, drug_record.drug_id, vis_id, sysdate, enddat, daily_am);
 dbms_output.put_line('Successfully done');
 end if;
 
 exception
-when no_doc then
-dbms_output.put_line('No doctor');
+when no_data then
+dbms_output.put_line('Incorect input data.');
 
-when no_vis then
-dbms_output.put_line('No visit planned');
 
-when no_drg then
-dbms_output.put_line('No such drug in hospital pharmacy');
 
 end;
 
