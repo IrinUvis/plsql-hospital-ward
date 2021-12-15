@@ -30,15 +30,14 @@ BEGIN
 END;
 
 --4. raise_salary procedure
+SELECT * FROM Doctors WHERE specialization_id = 'ALRG';
 exec hospital_package.raise_salary('ALRG',1);
+SELECT * FROM Doctors WHERE specialization_id = 'ALRG';
 rollback;
 
 --5. visits outcome
 select * from prescriptions;
-
-EXECUTE hospital_package.visit_outcome(101, 100, '06311195765', 'Cezera', '25-FEB-21', 2);
---incorrect data
-EXECUTE hospital_package.visit_outcome(102, 105, '98071691256', null, null, null);
+EXECUTE hospital_package.visit_outcome(198,'Zellec','25-FEB-21',2);
 rollback;
 
 --6. gender from PESEL trigger
@@ -69,6 +68,7 @@ INSERT INTO visits (
     820386, 100, 99112799315);
     select * from visits where visit_id = 820386;
     rollback;
+    
 --8. salary range trigger
 --test 1: number too small
 select * from specializations where specialization_id = 'NRLG';

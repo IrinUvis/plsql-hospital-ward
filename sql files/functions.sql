@@ -65,14 +65,6 @@ EXCEPTION
         RETURN 0;
 END specialization_average_stay_f;
 
-DECLARE
-    v_temp NUMBER;
-    v_specialization specializations.specialization_name%TYPE := 'Allergology';
-BEGIN
-    v_temp := specialization_average_stay_f(v_specialization);
-    DBMS_OUTPUT.PUT_LINE('Average stay at ' || v_specialization || ' is ' || v_temp || ' days. ');
-END;
-
 -- function calculating average dose per day of a drug with given name for patients from a given age group
 
 CREATE OR REPLACE FUNCTION avg_drug_dose_for_given_age_group_f
@@ -155,14 +147,3 @@ EXCEPTION
         DBMS_OUTPUT.PUT_LINE('Other unpredicted error occured');
         RETURN 0;
 END avg_drug_dose_for_given_age_group_f;
-
-DECLARE
-    v_temp NUMBER := 0;
-    v_drug_name drugs.drug_name%TYPE := 'Zinnat';
-    v_min_age NUMBER := 0;
-    v_max_age NUMBER := 100;
-BEGIN
-    v_temp := avg_drug_dose_for_given_age_group_f(v_drug_name, v_min_age, v_max_age);
-    DBMS_OUTPUT.PUT_LINE('An average dose of ' || v_drug_name || ' for patients from the group age between '
-    || v_min_age || ' and ' || v_max_age || ' is ' || v_temp);
-END;

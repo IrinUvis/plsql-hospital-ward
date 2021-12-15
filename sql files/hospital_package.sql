@@ -10,8 +10,7 @@ CREATE OR REPLACE PACKAGE hospital_package IS
     
     PROCEDURE raise_salary(spec_id in doctors.specialization_id%type, proc in number);
     
-    PROCEDURE visit_outcome(doc_id in doctors.doctor_id%type, vis_id in visits.visit_id%type, pt_id in patients.patient_id%type, drg_n in drugs.drug_name%type, 
-    enddat in prescriptions.end_date%type, daily_am in prescriptions.daily_amount%type);
+    PROCEDURE visit_outcome(vis_id in visits.visit_id%type, drg_n in drugs.drug_name%type, enddat in prescriptions.end_date%type, daily_am in prescriptions.daily_amount%type);
     
 END hospital_package;
 /
@@ -257,51 +256,47 @@ CREATE OR REPLACE PACKAGE BODY hospital_package IS
     end;
 
 --5.
-    procedure visit_outcome(doc_id in doctors.doctor_id%type, vis_id in visits.visit_id%type, pt_id in patients.patient_id%type, 
-    drg_n in drugs.drug_name%type, enddat in prescriptions.end_date%type, daily_am in prescriptions.daily_amount%type)
+    procedure visit_outcome(vis_id in visits.visit_id%type, drg_n in drugs.drug_name%type, enddat in prescriptions.end_date%type, daily_am in prescriptions.daily_amount%type)
     is
-        doc doctors.doctor_id%type;
         no_data exception;
         pragma exception_init(no_data,100);
-        drg drugs%rowtype;
-        vis visits%rowtype;
-        pat_id patients.patient_id%type;
-        prescr_max_id prescriptions.prescription_id%type;
-        is_found_rec boolean := false;
-        cursor c is 
-            select * from visits a inner join patients b on a.patient_id=b.patient_id 
-            inner join prescriptions c on a.visit_id=c.visit_id inner join drugs d on c.drug_id=d.drug_id 
-            where (c.end_date is null or c.end_date< sysdate) and d.drug_name=drg_n and c.daily_amount!=daily_am;
-        drug_record drugs%rowtype;
         
+        vis visits%rowtype; --do zczytania czy wizyta istnieje
+        
+        prescr_max_id prescriptions.prescription_id%type;
+        is_found_rec boolean := false; --czy powinien wykonac czesc w ifie po loopie
+        
+        cursor c is   
+            select * from prescriptions where visit_id in (select visit_id from visits where patient_id in (select patient_id from visits where visit_id=vis_id)) 
+            and end_date<sysdate and drug_id in (select drug_id from drugs where drug_name=drg_n); --czy temu pacjentowi podczas jakiejkolwiek wizyty zostala wystawiona receptaa na ten lek i czy data waznosci jest aktualna
+        drug_record drugs%rowtype; --do zczytania czy istnieje lek
     begin
-        select doctor_id into doc from doctors where doctor_id=doc_id;
-        select * into drg from drugs where drug_name=drg_n;
-        select * into vis from visits where visit_id=vis_id;
-        if vis.visit_id is null or drg.drug_id is null or doc is null then
+        --czy wizyta istnieje i czy lek istnieje
+        select * into drug_record from drugs where drug_name=drg_n;
+        if vis.visit_id is null or drug_record.drug_id is null then
             raise no_data;
         end if;
-
-        --get max_id of prescription
+        --get max_id of prescription (do wstawienia przy insercie)
         select max(prescription_id) into prescr_max_id from prescriptions;
-        --check if patient has this drug prescribed and end_date is null or before today. If yes then ends and gives new one.
+
+        --jezeli w kursorze jest recepta
         for rec in c 
         loop
             is_found_rec := true;
             dbms_output.put_line('Patient is currently taking this drug in daily amount of '|| rec.daily_amount);
             update prescriptions set end_date=sysdate where prescription_id=rec.prescription_id;
-            insert into prescriptions(prescription_id , drug_id, visit_id, start_date, end_date, daily_amount) values(prescr_max_id +1, drg.drug_id, vis_id, sysdate, enddat, daily_am);
-            dbms_output.put_line('Successfuly done');
+            insert into prescriptions(prescription_id , drug_id, visit_id, start_date, end_date, daily_amount) values(prescr_max_id +1, drug_record.drug_id, vis_id, sysdate, enddat, daily_am);
+            dbms_output.put_line('Successfully done');
         end loop;
 
-        if not is_found_rec then 
-            select * into drug_record from drugs where drug_name=drg_n;
+        --jezeli nie ma recepty wystawionej
+        if not is_found_rec then
             insert into prescriptions(prescription_id , drug_id, visit_id, start_date, end_date, daily_amount) values(prescr_max_id +1, drug_record.drug_id, vis_id, sysdate, enddat, daily_am);
             dbms_output.put_line('Successfully done');
         end if;
     exception
         when no_data then
-            dbms_output.put_line('Incorect input data.');
+            dbms_output.put_line('Incorrect input data.');
     end;
 
 END hospital_package;
