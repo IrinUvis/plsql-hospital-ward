@@ -204,44 +204,44 @@ INSERT INTO visits (
 
 -- DRUGS (8) --
 INSERT INTO drugs (
-    drug_id, drug_name, drug_description, dosage_method, serial_number) 
+    drug_id, drug_name, drug_description, dosage_method) 
     VALUES (
-    100, 'Cezera', 'Cezera helps to cope with allergy for grasses and birch', 'swallow', 123456);
+    100, 'Cezera', 'Cezera helps to cope with allergy for grasses and birch', 'swallow');
 
 INSERT INTO drugs (
-    drug_id, drug_name, drug_description, dosage_method, serial_number) 
+    drug_id, drug_name, drug_description, dosage_method) 
     VALUES (
-    101, 'Zinnat', 'Death to bacteries', 'swallow', 123123);
+    101, 'Zinnat', 'Death to bacteries', 'swallow');
 
 INSERT INTO drugs (
-    drug_id, drug_name, drug_description, dosage_method, serial_number) 
+    drug_id, drug_name, drug_description, dosage_method) 
     VALUES (
-    102, 'Augmenti', 'Death to bacteries', 'swallow', 231231);
+    102, 'Augmenti', 'Death to bacteries', 'swallow');
 
 INSERT INTO drugs (
-    drug_id, drug_name, drug_description, dosage_method, serial_number) 
+    drug_id, drug_name, drug_description, dosage_method) 
     VALUES (
-    103, 'Dexametazon', 'Helps to increase immunity', 'swallow', 534134);
+    103, 'Dexametazon', 'Helps to increase immunity', 'swallow');
 
 INSERT INTO drugs (
-    drug_id, drug_name, drug_description, dosage_method, serial_number) 
+    drug_id, drug_name, drug_description, dosage_method) 
     VALUES (
-    104, 'Flixonaze Nasule', 'Helps with occlusion of nose', 'instill', 123124);
+    104, 'Flixonaze Nasule', 'Helps with occlusion of nose', 'instill');
 
 INSERT INTO drugs (
-    drug_id, drug_name, drug_description, dosage_method, serial_number) 
+    drug_id, drug_name, drug_description, dosage_method) 
     VALUES (
-    105, 'Valtrikon', 'Helps to keep the pressure down', 'swallow', 756345);
+    105, 'Valtrikon', 'Helps to keep the pressure down', 'swallow');
 
 INSERT INTO drugs (
-    drug_id, drug_name, drug_description, dosage_method, serial_number) 
+    drug_id, drug_name, drug_description, dosage_method) 
     VALUES (
-    106, 'Dexilan', 'Helps with stomach pain', 'swallow', 892823);
+    106, 'Dexilan', 'Helps with stomach pain', 'swallow');
 
 INSERT INTO drugs (
-    drug_id, drug_name, drug_description, dosage_method, serial_number) 
+    drug_id, drug_name, drug_description, dosage_method) 
     VALUES (
-    107, 'Rosvera', 'Helps to lower cholesterol level', 'inject', 123341);
+    107, 'Rosvera', 'Helps to lower cholesterol level', 'inject');
 
 -- PRESCRIPTIONS (6) - --
 INSERT INTO prescriptions (

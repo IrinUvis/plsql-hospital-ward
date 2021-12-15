@@ -63,7 +63,6 @@ CREATE TABLE drugs (
     drug_name VARCHAR2(20) NOT NULL,
     drug_description VARCHAR2(200), -- nie moglo byc description bo to jakis keyword w plsql
     dosage_method VARCHAR2(50),
-    serial_number VARCHAR2(6), -- upewnienie się, że 6 znaków?
     CONSTRAINT pk_drugs
         PRIMARY KEY (drug_id)
 );
