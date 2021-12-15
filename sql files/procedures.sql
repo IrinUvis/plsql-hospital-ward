@@ -13,7 +13,7 @@ vis visits%rowtype; --do zczytania czy wizyta istnieje
 prescr_max_id prescriptions.prescription_id%type;
 is_found_rec boolean := false; --czy powinien wykonac czesc w ifie po loopie
 
-cursor c is   select * from prescriptions where visit_id in (select visit_id from visits where patient_id in (select patient_id from visits where visit_id=vis_id)) and end_date<sysdate and daily_amount!=daily_am and drug_id in (select drug_id from drugs where drug_name=drg_n); --czy temu pacjentowi podczas jakiejkolwiek wizyty zostala wystawiona receptaa na ten lek i czy data waznosci jest aktualna
+cursor c is   select * from prescriptions where visit_id in (select visit_id from visits where patient_id in (select patient_id from visits where visit_id=vis_id)) and end_date<sysdate and drug_id in (select drug_id from drugs where drug_name=drg_n); --czy temu pacjentowi podczas jakiejkolwiek wizyty zostala wystawiona receptaa na ten lek i czy data waznosci jest aktualna
 drug_record drugs%rowtype; --do zczytania czy istnieje lek
 
 begin
