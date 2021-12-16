@@ -22,6 +22,7 @@ BEGIN
         :NEW.registration_date := SYSDATE;
     ELSIF :NEW.registration_date > :NEW.discharge_date THEN
         :NEW.discharge_date := :NEW.registration_date;
+        dbms_output.put_line('The discharge date was incorrect and it was changed to ' || :NEW.registration_date ||'. If you think that another date should be set, please update it.');
     END IF;
 END;
     
