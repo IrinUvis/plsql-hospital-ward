@@ -1,7 +1,7 @@
 -- 1. Display doctor_id, last_name and specialization_name of these doctors 
 -- who had less appointments than the average number of appointments for a doctor
 
-SELECT d.doctor_id, d.last_name, s.specialization_name
+SELECT d.doctor_id, d.last_name, s.specialization_name, COUNT(v.visit_id) visits_number
 FROM doctors d
 JOIN visits v ON v.doctor_id = d.doctor_id
 JOIN specializations s ON s.specialization_id = d.specialization_id
@@ -65,7 +65,8 @@ SELECT s.specialization_name, MAX(d.salary) max_salary, MIN(d.salary) min_salary
         SUM(d.salary) salaries_sum, AVG(d.salary) avg_salary
 FROM doctors d
 LEFT JOIN specializations s ON s.specialization_id = d.specialization_id
-GROUP BY s.specialization_name;
+GROUP BY s.specialization_name
+ORDER BY specialization_name;
 
 -- 9. Display patients registered in the hospital ward on the day of the week 
 -- on which the highest number of patients were registered
@@ -78,7 +79,8 @@ WHERE TO_CHAR(registration_date, 'D') = (SELECT TO_CHAR(registration_date, 'D')
                                     GROUP BY TO_CHAR(registration_date, 'D')
                                     HAVING COUNT(*) = (SELECT MAX(COUNT(*)) 
                                                         FROM visits
-                                                        GROUP BY TO_CHAR(registration_date,'DAY')));
+                                                        GROUP BY TO_CHAR(registration_date,'DAY')))
+ORDER BY p.last_name, p.first_name;
                                                         
 -- 10. Display names and hire dates of all doctors who were hired
 -- after Regan Hall. 
@@ -99,9 +101,11 @@ ORDER BY EXTRACT(YEAR FROM v.registration_date) ASC;
 -- 12. Show average length of a hospital stay for patients grouped by the specialization name. 
 
 SELECT s.specialization_name, specialization_average_stay_f(s.specialization_name) average_stay
-FROM specializations s;
+FROM specializations s
+ORDER BY s.specialization_name;
 
 -- 13. Show average dose of all drugs per day prescribed for all patients
 
 SELECT d.drug_name, avg_drug_dose_for_given_age_group_f(d.drug_name, 0, 150) average_dose
-FROM drugs d;
+FROM drugs d
+ORDER BY d.drug_name;
