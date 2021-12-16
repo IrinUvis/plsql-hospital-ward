@@ -58,18 +58,14 @@ WHERE s.specialization_id = d.specialization_id AND d.doctor_id = v.doctor_id
 GROUP BY s.specialization_name
 ORDER BY s.specialization_name;
 
--- 8. Display specialization_name with doctor's id, last_name and salary of those doctors
--- who earn the most in specific specialization
-
--- one unnecesarry row appears... why?
-
-SELECT s.specialization_name, d.doctor_id, d.last_name, d.salary
+-- 8. Display salary statistics (maximum, minimum, average and salaries sum) for each specialization, doctors of which
+-- work in the hospital
+                
+SELECT s.specialization_name, MAX(d.salary) max_salary, MIN(d.salary) min_salary,
+        SUM(d.salary) salaries_sum, AVG(d.salary) avg_salary
 FROM doctors d
-JOIN specializations s ON s.specialization_id = d.specialization_id
-WHERE d.salary IN (SELECT MAX(d.salary)
-                FROM doctors d
-                RIGHT JOIN specializations s ON s.specialization_id = d.specialization_id
-                GROUP BY s.specialization_name);
+LEFT JOIN specializations s ON s.specialization_id = d.specialization_id
+GROUP BY s.specialization_name;
 
 -- 9. Display patients registered in the hospital ward on the day of the week 
 -- on which the highest number of patients were registered
