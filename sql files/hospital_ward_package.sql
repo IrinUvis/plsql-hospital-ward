@@ -6,11 +6,11 @@ CREATE OR REPLACE PACKAGE hospital_package IS
     FUNCTION avg_drug_dose_for_given_age_group_f(drug_name_in IN drugs.drug_name%TYPE, min_age_in IN NUMBER, max_age_in IN NUMBER)
     RETURN NUMBER;
     
-    PROCEDURE show_patients_history(pat_id in patients.patient_id%type);
+    PROCEDURE show_patients_history(pat_id IN patients.patient_id%TYPE);
     
-    PROCEDURE raise_salary(spec_id in doctors.specialization_id%type, proc in number);
+    PROCEDURE raise_salary(spec_id IN doctors.specialization_id%TYPE, proc IN number);
     
-    PROCEDURE visit_outcome(vis_id in visits.visit_id%type, drg_n in drugs.drug_name%type, enddat in prescriptions.end_date%type, daily_am in prescriptions.daily_amount%type);
+    PROCEDURE visit_outcome(vis_id IN visits.visit_id%TYPE, drg_n IN drugs.drug_name%TYPE, enddat IN prescriptions.end_date%TYPE, daily_am IN prescriptions.daily_amount%TYPE);
     
 END hospital_package;
 /
@@ -163,140 +163,134 @@ CREATE OR REPLACE PACKAGE BODY hospital_package IS
     END avg_drug_dose_for_given_age_group_f;
 
 --3.
-    procedure show_patients_history(pat_id in patients.patient_id%type)
-    is
-        cursor history is 
-            select * from patients a 
-            inner join visits b on a.patient_id = b.patient_id 
-            inner join doctors c on c.doctor_id=b.doctor_id 
-            inner join specializations d on  c.specialization_id=d.specialization_id 
-            inner join prescriptions e on e.visit_id=b.visit_id 
-            inner join drugs f on e.drug_id=f.drug_id 
-            where a.patient_id=pat_id;
+    PROCEDURE show_patients_history(pat_id IN patients.patient_id%TYPE)
+    IS
+        CURSOR history IS 
+            SELECT * FROM patients a 
+            INNER JOIN visits b ON a.patient_id = b.patient_id 
+            INNER JOIN doctors c ON c.doctor_id=b.doctor_id 
+            INNER JOIN specializations d ON  c.specialization_id=d.specialization_id 
+            INNER JOIN prescriptions e ON e.visit_id=b.visit_id 
+            INNER JOIN drugs f ON e.drug_id=f.drug_id 
+            WHERE a.patient_id=pat_id;
             
-            is_found_rec boolean := false;
-            pat patients%rowtype;
+            is_found_rec BOOLEAN := false;
+            pat patients%ROWTYPE;
 
-            e exception;
-            no_rec exception;
+            e EXCEPTION;
+            no_rec EXCEPTION;
             pragma exception_init(e,100);
 
-    begin
-        --check if record pesel is valid
-        select * into pat from patients where patient_id=pat_id;
+    BEGIN
+        SELECT * INTO pat FROM patients WHERE patient_id=pat_id;
         
-        if pat.patient_id is null then
-            raise e; 
-        else
+        IF pat.patient_id IS NULL THEN
+            RAISE e; 
+        ELSE
             dbms_output.put_line('Patient: ' || pat.first_name || ' ' || pat.last_name);
             dbms_output.put_line('Date_of_birth: ' || pat.date_of_birth);
-            if pat.gender='F' then
+            IF pat.gender='F' THEN
                 dbms_output.put_line('Gender: Female');
-            else
+            ELSE
                 dbms_output.put_line('Gender: Male');
-            end if;
+            END IF;
                 dbms_output.put_line('Phone number: ' || pat.phone_number);
-        end if;
+        END IF;
 
         FOR rec IN history
         LOOP  
             is_found_rec := true;
-            if rec.discharge_date is null then
+            IF rec.discharge_date IS NULL THEN
                 dbms_output.put_line('Patient has a visit from ' || rec.Registration_date || ' - until now and has been served by '|| rec.specialization_name ||'. During visit patient was prescribed for '|| rec.drug_name || ' with dosage '|| rec.daily_amount || ' for time between ' || rec.start_date || ' - ' || rec.end_date );
-            else
+            ELSE
                 dbms_output.put_line('Patient had a visit between ' || rec.Registration_date || ' - ' || rec.discharge_date ||' and has been served by '|| rec.specialization_name || '. During visit patient was prescribed for '|| rec.drug_name ||  ' with dosage '|| rec.daily_amount || ' for time between ' || rec.start_date || ' - ' || rec.end_date );
-            end if; 
+            END IF; 
         END LOOP; 
 
-         if not is_found_rec then 
-            raise no_rec;
-         end if;
+         IF NOT is_found_rec THEN 
+            RAISE no_rec;
+         END IF;
 
-    exception
-        when e then
+    EXCEPTION
+        WHEN e THEN
             dbms_output.put_line('failed');
         
-        when no_rec then
+        WHEN no_rec THEN
             dbms_output.put_line('Patient has no history');
-    end;
+    END;
 
 --4.
-    procedure raise_salary(spec_id in doctors.specialization_id%type, proc in number)
+    PROCEDURE raise_salary(spec_id IN doctors.specialization_id%TYPE, proc IN number)
     IS 
-        is_found_rec boolean := false;    
-        CURSOR c is select * from doctors a inner join specializations b on a.specialization_id=b.specialization_id where a.specialization_id=spec_id;
-        new_max_sal_from_doc  doctors.salary%type;  
-        new_max_sal_from_spec doctors.salary%type; 
+        is_found_rec BOOLEAN := false;    
+        CURSOR c IS SELECT * FROM doctors a inner join specializations b ON a.specialization_id=b.specialization_id WHERE a.specialization_id=spec_id;
+        new_max_sal_from_doc  doctors.salary%TYPE;  
+        new_max_sal_from_spec doctors.salary%TYPE; 
     BEGIN    
-
         FOR rec IN c
         LOOP  
             is_found_rec := true;
     
-            if rec.gender = 'F' then
+            IF rec.gender = 'F' THEN
                 dbms_output.put_line('Doctor '|| rec.first_name || ' '|| rec.last_name || ' had ' || rec.salary|| '. Now she will have '|| rec.salary*(1+proc/100));
-            else
+            ELSE
                 dbms_output.put_line('Doctor '|| rec.first_name || ' '|| rec.last_name || ' had ' || rec.salary|| '. Now he will have '|| rec.salary*(1+proc/100));
-            end if;
+            END IF;
         END LOOP; 
 
-        if not is_found_rec then 
+        IF NOT is_found_rec THEN 
             dbms_output.put_line('No doctors in provided specialization');
-        end if;
+        END IF;
  
  
-        update doctors set salary=salary*(1+proc/100) where specialization_id=spec_id;
-        select max(salary) into new_max_sal_from_doc from doctors where specialization_id=spec_id;
-        select max(max_salary) into new_max_sal_from_spec from specializations where specialization_id=spec_id;
+        UPDATE doctors SET salary=salary*(1+proc/100) WHERE specialization_id=spec_id;
+        SELECT MAX(salary) INTO new_max_sal_from_doc FROM doctors WHERE specialization_id=spec_id;
+        SELECT MAX(max_salary) INTO new_max_sal_from_spec FROM specializations WHERE specialization_id=spec_id;
         
-        if new_max_sal_from_doc>new_max_sal_from_spec then
-            update specializations set max_salary=new_max_sal_from_doc where specialization_id=spec_id;
-        end if;
+        IF new_max_sal_from_doc>new_max_sal_from_spec THEN
+            UPDATE specializations SET max_salary=new_max_sal_from_doc WHERE specialization_id=spec_id;
+        END IF;
 
-    end;
+    END;
 
 --5.
-    procedure visit_outcome(vis_id in visits.visit_id%type, drg_n in drugs.drug_name%type, enddat in prescriptions.end_date%type, daily_am in prescriptions.daily_amount%type)
-    is
-        no_data exception;
+    PROCEDURE visit_outcome(vis_id IN visits.visit_id%TYPE, drg_n IN drugs.drug_name%TYPE, enddat IN prescriptions.end_date%TYPE, daily_am IN prescriptions.daily_amount%TYPE)
+    IS
+        no_data EXCEPTION;
         pragma exception_init(no_data,100);
         
-        vis visits%rowtype; --do zczytania czy wizyta istnieje
+        vis visits%ROWTYPE; 
         
-        prescr_max_id prescriptions.prescription_id%type;
-        is_found_rec boolean := false; --czy powinien wykonac czesc w ifie po loopie
+        prescr_max_id prescriptions.prescription_id%TYPE;
+        is_found_rec BOOLEAN := false; 
         
-        cursor c is   
-            select * from prescriptions where visit_id in (select visit_id from visits where patient_id in (select patient_id from visits where visit_id=vis_id)) 
-            and end_date<sysdate and drug_id in (select drug_id from drugs where drug_name=drg_n); --czy temu pacjentowi podczas jakiejkolwiek wizyty zostala wystawiona receptaa na ten lek i czy data waznosci jest aktualna
-        drug_record drugs%rowtype; --do zczytania czy istnieje lek
-    begin
-        --czy wizyta istnieje i czy lek istnieje
-        select * into drug_record from drugs where drug_name=drg_n;
-        if vis.visit_id is null or drug_record.drug_id is null then
-            raise no_data;
-        end if;
-        --get max_id of prescription (do wstawienia przy insercie)
-        select max(prescription_id) into prescr_max_id from prescriptions;
+        CURSOR c IS   
+            SELECT * FROM prescriptions WHERE visit_id IN (SELECT visit_id FROM visits WHERE patient_id IN (SELECT patient_id FROM visits WHERE visit_id = vis_id)) 
+            AND end_date < SYSDATE AND drug_id IN (SELECT drug_id FROM drugs WHERE drug_name = drg_n); 
+        drug_record drugs%ROWTYPE; 
+   BEGIN
+        SELECT * INTO drug_record FROM drugs WHERE drug_name=drg_n;
+        IF vis.visit_id IS NULL OR drug_record.drug_id IS NULL THEN
+            RAISE no_data;
+        END IF;
+        SELECT MAX(prescription_id) INTO prescr_max_id FROM prescriptions;
 
-        --jezeli w kursorze jest recepta
-        for rec in c 
-        loop
+        FOR rec IN c 
+        LOOP
             is_found_rec := true;
-            dbms_output.put_line('Patient is currently taking this drug in daily amount of '|| rec.daily_amount);
-            update prescriptions set end_date=sysdate where prescription_id=rec.prescription_id;
-            insert into prescriptions(prescription_id , drug_id, visit_id, start_date, end_date, daily_amount) values(prescr_max_id +1, drug_record.drug_id, vis_id, sysdate, enddat, daily_am);
+            dbms_output.put_line('Patient is currently taking this drug IN daily amount of '|| rec.daily_amount);
+            UPDATE prescriptions SET end_date=SYSDATE WHERE prescription_id=rec.prescription_id;
+            INSERT INTO prescriptions(prescription_id , drug_id, visit_id, start_date, end_date, daily_amount) VALUES(prescr_max_id +1, drug_record.drug_id, vis_id, SYSDATE, enddat, daily_am);
             dbms_output.put_line('Successfully done');
-        end loop;
+        END LOOP;
 
-        --jezeli nie ma recepty wystawionej
-        if not is_found_rec then
-            insert into prescriptions(prescription_id , drug_id, visit_id, start_date, end_date, daily_amount) values(prescr_max_id +1, drug_record.drug_id, vis_id, sysdate, enddat, daily_am);
+        IF NOT is_found_rec THEN
+            INSERT INTO prescriptions(prescription_id , drug_id, visit_id, start_date, end_date, daily_amount) VALUES(prescr_max_id +1, drug_record.drug_id, vis_id, SYSDATE, enddat, daily_am);
             dbms_output.put_line('Successfully done');
-        end if;
-    exception
-        when no_data then
+        END IF;
+    EXCEPTION
+        WHEN no_data THEN
             dbms_output.put_line('Incorrect input data.');
-    end;
+    END;
 
 END hospital_package;

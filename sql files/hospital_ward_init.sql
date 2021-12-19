@@ -97,6 +97,7 @@ BEGIN
         :NEW.gender := 'M';
     END IF;
 END;
+/
 
 -- 2. If the discharge date is earlier than the registration, react 
 CREATE OR REPLACE TRIGGER visit_dates_trg BEFORE INSERT OR UPDATE ON visits
@@ -109,6 +110,7 @@ BEGIN
         dbms_output.put_line('The discharge date was incorrect and it was changed to ' || :NEW.registration_date ||'. If you think that another date should be set, please update it.');
     END IF;
 END;
+/
     
 -- 3. Check if the salary is between the range for the given specialization
 CREATE OR REPLACE TRIGGER salary_check BEFORE INSERT OR UPDATE ON Doctors
@@ -124,6 +126,7 @@ BEGIN
         :NEW.salary := min_sal;
     END IF;
 END;
+/
 
 -- 4. Check and put proper birth date based on the pesel
 CREATE OR REPLACE TRIGGER check_birth_date_trg BEFORE INSERT OR UPDATE ON Patients
@@ -141,7 +144,7 @@ BEGIN
         :NEW.date_of_birth := l_date;
     END IF;
 END;
-
+/
 -------------
 -- INSERTS --
 -------------
