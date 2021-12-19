@@ -137,7 +137,11 @@ l_str_date VARCHAR2(6);
 BEGIN
     l_str_date := substr(:NEW.patient_id, 0, 6);
     IF SUBSTR(l_str_date, 3, 1) > 1 THEN
-        l_str_date := REGEXP_REPLACE(l_str_date, SUBSTR(l_str_date, 3, 1), '1', 3, 1);
+        IF SUBSTR(l_str_date, 4, 1) > 2 THEN
+            l_str_date := REGEXP_REPLACE(l_str_date, SUBSTR(l_str_date, 3, 1), '0', 3, 1);
+        ELSE
+            l_str_date := REGEXP_REPLACE(l_str_date, SUBSTR(l_str_date, 3, 1), '1', 3, 1);
+        END IF;
     END IF;
     l_date := TO_DATE(l_str_date, 'YYMMDD');
     IF :NEW.date_of_birth != l_date THEN

@@ -99,11 +99,11 @@ GROUP BY EXTRACT(YEAR FROM v.registration_date)
 ORDER BY EXTRACT(YEAR FROM v.registration_date) ASC;
 
 -- 12. Show average length of a hospital stay for patients grouped by the specialization name. 
-SELECT s.specialization_name, specialization_average_stay_f(s.specialization_name) average_stay
+SELECT s.specialization_name, hospital_package.specialization_average_stay_f(s.specialization_name) average_stay
 FROM specializations s
 ORDER BY s.specialization_name;
 
 -- 13. Show average dose of all drugs per day prescribed for all patients
-SELECT d.drug_name, avg_drug_dose_for_given_age_group_f(d.drug_name, 0, 150) average_dose
+SELECT d.drug_name, hospital_package.avg_drug_dose_for_given_age_group_f(d.drug_name, 0, 150) average_dose
 FROM drugs d
 ORDER BY d.drug_name;
